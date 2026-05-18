@@ -1,3 +1,6 @@
+import dns from "node:dns";
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
@@ -30,6 +33,10 @@ app.use(express.json());
 // routes
 app.use("/api/auth", authRoutes);
 app.use("/api/rooms", roomRoutes);
+
+app.get("/", (req, res) => {
+  res.send("CodeCollab Backend Server is running!");
+});
 
 // socket auth middleware
 io.use((socket, next) => {
