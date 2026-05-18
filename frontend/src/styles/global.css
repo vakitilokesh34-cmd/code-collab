@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* root */
+:root {
+  color-scheme: dark;
+  --bg: #070B16;
+  --sidebar: #020817;
+  --header: #020817;
+  --card: #0F172A;
+  --border: #1E293B;
+  --text: #ffffff;
+  --text-secondary: #94a3b8;
+  --primary: #12F7A0;
+  --editor-bg: #020817;
+  --font-main: 'Inter', sans-serif;
+}
+
+.light-mode {
+  color-scheme: light;
+  --bg: #f8fafc;
+  --sidebar: #ffffff;
+  --header: #ffffff;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text-secondary: #64748b;
+  --primary: #10b981;
+  --editor-bg: #ffffff;
+  --font-main: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* reset */
+* {
+
+  margin: 0;
+  padding: 0;
+
+  box-sizing: border-box;
+}
+
+/* html */
+html {
+
+  scroll-behavior: smooth;
+}
+
+/* body */
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* root div */
+#root {
+
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* buttons */
+button {
+
+  cursor: pointer;
+
+  transition:
+    all 0.2s ease;
+}
+
+/* inputs */
+input,
+textarea,
+select {
+
+  font-family:
+    inherit;
+}
+
+/* links */
+a {
+
+  text-decoration: none;
+  color: inherit;
+}
+
+/* scrollbar */
+::-webkit-scrollbar {
+
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+
+  background: #334155;
+}
+
+/* monaco editor fixes */
+.monaco-editor,
+.monaco-editor-background,
+.monaco-editor .inputarea {
+  background-color: var(--editor-bg) !important;
+}
+
+/* utility classes */
+.glass {
+
+  background:
+    rgba(15, 23, 42, 0.7);
+
+  backdrop-filter:
+    blur(12px);
+
+  border:
+    1px solid
+    rgba(255,255,255,0.05);
+}
+
+.card {
+
+  background:
+    var(--card);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    24px;
+}
+
+/* animations */
+.fade-in {
+
+  animation:
+    fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+
+  from {
+
+    opacity: 0;
+    transform:
+      translateY(10px);
+  }
+
+  to {
+
+    opacity: 1;
+    transform:
+      translateY(0);
+  }
+}
