@@ -20,6 +20,7 @@ import {
   Sun
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import API from "../services/api";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -42,20 +43,10 @@ export default function Home() {
     } else {
       const fetchRecent = async () => {
         try {
-          const token = localStorage.getItem("token");
-          console.log("DEBUG: Fetching history with token exists:", !!token);
-          const res = await fetch("http://localhost:5000/api/rooms/recent", {
-            headers: { "Authorization": `Bearer ${token}` }
-          });
-          if (res.ok) {
-            const data = await res.json();
-            console.log("DEBUG: History data received:", data.length);
-            setRecentRooms(data);
-          } else {
-            console.error("DEBUG: API Error", res.status);
-            const stored = JSON.parse(localStorage.getItem("recentRooms")) || [];
-            setRecentRooms(stored);
-          }
+          console.log("DEBUG: Fetching history...");
+          const { data } = await API.get("/rooms/recent");
+          console.log("DEBUG: History data received:", data.length);
+          setRecentRooms(data);
         } catch (error) {
           console.error("DEBUG: Fetch Failed", error);
           const stored = JSON.parse(localStorage.getItem("recentRooms")) || [];
@@ -113,15 +104,9 @@ export default function Home() {
   const clearHistory = async () => {
     if (!window.confirm("Are you sure you want to close and clear all recent rooms? This cannot be undone.")) return;
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/rooms/clear-history", {
-        method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      if (res.ok) {
-        setRecentRooms([]);
-        localStorage.removeItem("recentRooms");
-      }
+      await API.delete("/rooms/clear-history");
+      setRecentRooms([]);
+      localStorage.removeItem("recentRooms");
     } catch (error) {
       console.error("Failed to clear history", error);
     }

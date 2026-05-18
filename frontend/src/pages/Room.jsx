@@ -29,6 +29,7 @@ import {
   Terminal
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import API from "../services/api";
 
 const CURSOR_COLORS = [
   "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
@@ -93,23 +94,9 @@ export default function Room() {
   useEffect(() => {
     const fetchRecent = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          const stored = JSON.parse(localStorage.getItem("recentRooms")) || [];
-          setRecentRooms(stored);
-          return;
-        }
-        const res = await fetch("http://localhost:5000/api/rooms/recent", {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setRecentRooms(data);
-          if (data.length > 0) localStorage.setItem("recentRooms", JSON.stringify(data));
-        } else {
-          const stored = JSON.parse(localStorage.getItem("recentRooms")) || [];
-          setRecentRooms(stored);
-        }
+        const { data } = await API.get("/rooms/recent");
+        setRecentRooms(data);
+        if (data.length > 0) localStorage.setItem("recentRooms", JSON.stringify(data));
       } catch (error) {
         console.error("Failed to fetch recent rooms:", error);
         const stored = JSON.parse(localStorage.getItem("recentRooms")) || [];
