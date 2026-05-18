@@ -21,11 +21,17 @@ const server = http.createServer(app);
 // socket setup
 const io = new Server(server, {
   cors: {
-    origin: (origin, callback) => {
-      // Dynamically allow all origins to prevent CORS errors on any deployment (like Vercel) or local ports
-      callback(null, true);
-    },
+    origin: [
+      "https://code-collab-jade.vercel.app",
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:5175",
+      "http://localhost:5176",
+      "http://localhost:5177",
+      process.env.CLIENT_URL
+    ].filter(Boolean),
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
