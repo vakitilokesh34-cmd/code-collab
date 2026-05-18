@@ -21,22 +21,20 @@ const server = http.createServer(app);
 // socket setup
 const io = new Server(server, {
   cors: {
-    origin: [
-      "https://code-collab-jade.vercel.app",
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:5175",
-      "http://localhost:5176",
-      "http://localhost:5177",
-      process.env.CLIENT_URL
-    ].filter(Boolean),
+    origin: (origin, callback) => {
+      // Dynamically allow all origins to prevent CORS errors, especially when using credentials
+      callback(null, true);
+    },
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
 // middleware
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => callback(null, true),
+  credentials: true,
+}));
 app.use(express.json());
 
 // routes
@@ -44,7 +42,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/rooms", roomRoutes);
 
 app.get("/", (req, res) => {
-  res.send("CodeCollab Backend Server is running!");
+  res.send("CodeCollab Backend Server is running! v1.0.1 - Dynamic CORS Enabled");
 });
 
 // socket auth middleware
