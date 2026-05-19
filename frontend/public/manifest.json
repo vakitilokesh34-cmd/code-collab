@@ -1,0 +1,32 @@
+{
+  "name": "CodeCollab",
+  "short_name": "CodeCollab",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070B16",
+  "theme_color": "#10B981",
+  "description": "Real-time Collaborative Editor",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "CodeCollab",
+      "short_name": "CodeCollab",
+      "description": "Open your collaborative workspace",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}

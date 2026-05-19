@@ -20,7 +20,7 @@ import {
   Edit2,
   Trash2,
   FileText,
-  Code2,
+  Code,
   Moon,
   Sun,
   X as XIcon,
@@ -406,7 +406,7 @@ export default function Room() {
       {/* VERTICAL NAV BAR */}
       <div className="w-16 border-r border-[var(--border)] bg-[var(--sidebar)] flex flex-col items-center py-6 gap-8 shrink-0 z-50">
         <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-black shadow-[0_0_20px_rgba(16,185,129,0.3)] mb-4">
-          <Code2 size={24} />
+          <Code size={24} />
         </div>
         
         <div className="flex flex-col gap-4">

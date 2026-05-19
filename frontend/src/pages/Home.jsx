@@ -6,7 +6,7 @@ import {
   Plus, 
   LogIn, 
   LogOut, 
-  Code2, 
+  Code, 
   Users, 
   Zap, 
   Shield, 
@@ -118,7 +118,7 @@ export default function Home() {
       <nav className="h-20 border-b border-[var(--border)] flex items-center justify-between px-8 bg-[var(--header)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-black shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-            <Code2 size={24} />
+            <Code size={24} />
           </div>
           <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-[var(--text)] to-[var(--text-secondary)] bg-clip-text text-transparent">
             CodeCollab
