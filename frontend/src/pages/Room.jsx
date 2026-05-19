@@ -73,6 +73,15 @@ export default function Room() {
   const [roomPassword, setRoomPassword] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [userCursorPositions, setUserCursorPositions] = useState({}); // { username: { line, column } }
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 768;
 
   const editorRef = useRef(null);
   const decorationsRef = useRef([]);
@@ -384,6 +393,16 @@ export default function Room() {
 
   return (
     <div className="h-screen bg-[var(--bg)] text-[var(--text)] font-sans flex overflow-hidden">
+      {/* BACKDROP FOR MOBILE */}
+      {isMobile && (isSidebarOpen || isChatOpen) && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-[1px] z-30 animate-in fade-in duration-200"
+          onClick={() => {
+            setIsSidebarOpen(false);
+            setIsChatOpen(false);
+          }}
+        />
+      )}
       {/* VERTICAL NAV BAR */}
       <div className="w-16 border-r border-[var(--border)] bg-[var(--sidebar)] flex flex-col items-center py-6 gap-8 shrink-0 z-50">
         <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-black shadow-[0_0_20px_rgba(16,185,129,0.3)] mb-4">
@@ -423,6 +442,7 @@ export default function Room() {
                 } else {
                   setActiveSidebar(item.id);
                   setIsSidebarOpen(true);
+                  if (isMobile) setIsChatOpen(false);
                 }
               }}
               className={`p-3 rounded-xl transition-all group relative ${item.id === "terminal" ? (bottomPanelState !== "closed" ? "bg-emerald-500/10 text-emerald-400" : "text-slate-500") : (activeSidebar === item.id && isSidebarOpen ? "bg-emerald-500/10 text-emerald-400" : "text-slate-500 hover:text-slate-300")}`}
@@ -438,7 +458,11 @@ export default function Room() {
 
         <div className="mt-auto flex flex-col gap-4">
           <button
-            onClick={() => setIsChatOpen(o => !o)}
+            onClick={() => setIsChatOpen(o => {
+              const next = !o;
+              if (next && isMobile) setIsSidebarOpen(false);
+              return next;
+            })}
             className={`p-3 rounded-xl transition-all relative ${isChatOpen ? "bg-emerald-500/10 text-emerald-400" : "text-slate-500 hover:text-slate-300"}`}
             title="Chat"
           >
@@ -456,7 +480,7 @@ export default function Room() {
 
       {/* DYNAMIC SIDEBAR */}
       {isSidebarOpen && (
-        <div className="w-72 md:w-64 border-r border-[var(--border)] bg-[var(--sidebar)] flex flex-col shrink-0 animate-in slide-in-from-left duration-300">
+        <div className="fixed md:relative left-16 md:left-0 top-0 bottom-0 h-full z-40 w-[calc(100vw-64px)] sm:w-72 md:w-64 border-r border-[var(--border)] bg-[var(--sidebar)] flex flex-col shrink-0 shadow-2xl md:shadow-none animate-in slide-in-from-left duration-300">
           <div className="p-6 border-b border-[var(--border)] flex items-center justify-between">
             <h2 className="text-sm font-black uppercase tracking-widest text-[var(--text-secondary)]">
               {activeSidebar}
@@ -620,22 +644,26 @@ export default function Room() {
       )}
 
       <div className="flex-1 flex flex-col min-w-0 border-r border-[var(--border)]">
-        <div className="h-14 border-b border-[var(--border)] bg-[var(--header)] flex items-center justify-between px-6 shrink-0 z-10">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-md">
+        <div className="h-14 border-b border-[var(--border)] bg-[var(--header)] flex items-center justify-between px-3 sm:px-6 shrink-0 z-10">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1 mr-2">
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-[120px] xs:max-w-[200px] sm:max-w-md">
               {files.map(file => (
                 <div 
                   key={file.name}
                   onClick={() => setActiveFile(file.name)}
-                  className={`px-3 py-1 text-xs rounded-t-lg border-x border-t border-transparent cursor-pointer flex items-center gap-2 shrink-0 transition-all ${activeFile === file.name ? "bg-slate-900 border-slate-800 text-emerald-400" : "text-slate-500 hover:text-slate-300"}`}
+                  className={`px-2 sm:px-3 py-1 text-[10px] sm:text-xs rounded-t-lg border-x border-t border-transparent cursor-pointer flex items-center gap-1 sm:gap-2 shrink-0 transition-all ${activeFile === file.name ? "bg-slate-900 border-slate-800 text-emerald-400" : "text-slate-500 hover:text-slate-300"}`}
                 >
-                  <FileText size={12} /> {file.name}
+                  <FileText size={10} className="sm:w-3 sm:h-3" /> <span className="max-w-[60px] sm:max-w-none truncate">{file.name}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <select value={language} onChange={e => setLanguage(e.target.value)} className="bg-slate-900 border border-slate-800 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md outline-none">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <select 
+              value={language} 
+              onChange={e => setLanguage(e.target.value)} 
+              className="bg-slate-900 border border-slate-800 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 sm:px-2 py-1 rounded-md outline-none max-w-[70px] xs:max-w-[100px] sm:max-w-none"
+            >
               {["javascript", "python", "java", "cpp", "c", "go", "rust", "ruby", "php", "typescript", "swift", "kotlin", "csharp"].map(l => <option key={l} value={l}>{l}</option>)}
             </select>
             <button 
@@ -645,12 +673,14 @@ export default function Room() {
                 setIsCopying(true); 
                 setTimeout(() => setIsCopying(false), 2000)
               }} 
-              className="p-2 bg-slate-900 border border-slate-800 rounded-md hover:bg-slate-800"
+              className="p-1.5 sm:p-2 bg-slate-900 border border-slate-800 rounded-md hover:bg-slate-800"
+              title="Copy Room Link"
             >
-              {isCopying ? <Check size={14} className="text-emerald-500" /> : <Share2 size={14} />}
+              {isCopying ? <Check size={12} className="text-emerald-500 sm:w-3.5 sm:h-3.5" /> : <Share2 size={12} className="sm:w-3.5 sm:h-3.5" />}
             </button>
-            <button onClick={runCode} className="flex items-center gap-2 bg-emerald-500 text-black px-4 py-1 rounded-md text-xs font-bold hover:bg-emerald-400">
-              <Play size={14} fill="currentColor" /> RUN
+            <button onClick={runCode} className="flex items-center gap-1.5 sm:gap-2 bg-emerald-500 text-black px-2.5 sm:px-4 py-1.5 rounded-md text-xs font-bold hover:bg-emerald-400">
+              <Play size={12} fill="currentColor" className="sm:w-3.5 sm:h-3.5" />
+              <span className="hidden sm:inline">RUN</span>
             </button>
           </div>
         </div>
@@ -799,7 +829,7 @@ export default function Room() {
 
       {/* RIGHT CHAT PANEL */}
       {isChatOpen && (
-        <div className="w-80 border-l border-[var(--border)] bg-[var(--sidebar)] flex flex-col shrink-0 animate-in slide-in-from-right duration-300">
+        <div className="fixed md:relative right-0 top-0 bottom-0 h-full z-40 w-[calc(100vw-64px)] sm:w-80 border-l border-[var(--border)] bg-[var(--sidebar)] flex flex-col shrink-0 shadow-2xl md:shadow-none animate-in slide-in-from-right duration-300">
           <div className="h-14 border-b border-[var(--border)] flex items-center justify-between px-5 shrink-0">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center">

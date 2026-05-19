@@ -151,42 +151,42 @@ export default function Home() {
       </nav>
 
       {/* HERO SECTION */}
-      <main className="max-w-7xl mx-auto px-8 pt-20 pb-32">
-        <div className="grid lg:grid-cols-2 gap-16 items-center mb-32">
+      <main className="max-w-7xl mx-auto px-4 sm:px-8 pt-10 sm:pt-20 pb-16 sm:pb-32">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-20 sm:mb-32">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mb-6 uppercase tracking-widest">
               <Zap size={14} fill="currentColor" />
               Real-time collaboration
             </div>
-            <h1 className="text-6xl md:text-8xl font-black leading-tight mb-6 md:mb-8">
+            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black leading-tight mb-6 md:mb-8">
               Code together, <br />
               <span className="text-emerald-500">anywhere.</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-400 max-w-lg mb-8 md:mb-12 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-lg mb-8 md:mb-12 leading-relaxed">
               The ultimate platform for real-time pair programming, interviews, and team collaboration. High performance, low latency.
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4">
               <button
                 onClick={() => setShowModal(true)}
-                className="bg-emerald-500 hover:bg-emerald-400 text-black px-10 py-5 rounded-2xl font-bold text-xl transition-all shadow-[0_0_40px_rgba(16,185,129,0.3)] flex items-center gap-2"
+                className="w-full sm:w-auto justify-center bg-emerald-500 hover:bg-emerald-400 text-black px-6 sm:px-10 py-4 sm:py-5 rounded-2xl font-bold text-lg sm:text-xl transition-all shadow-[0_0_40px_rgba(16,185,129,0.3)] flex items-center gap-2"
               >
-                <Plus size={24} strokeWidth={3} />
+                <Plus size={20} strokeWidth={3} />
                 Create New Room
               </button>
-              <div className="flex bg-[var(--card)] border border-[var(--border)] p-1.5 rounded-2xl focus-within:border-emerald-500/50 transition-all shadow-2xl">
+              <div className="flex bg-[var(--card)] border border-[var(--border)] p-1.5 rounded-2xl focus-within:border-emerald-500/50 transition-all shadow-2xl w-full sm:w-auto">
                 <input
                   value={joinRoomId}
                   onChange={(e) => setJoinRoomId(e.target.value)}
                   placeholder="Enter Room ID"
-                  className="bg-transparent px-6 py-3 outline-none text-xl w-64 text-[var(--text)]"
+                  className="bg-transparent px-4 sm:px-6 py-2.5 sm:py-3 outline-none text-base sm:text-xl flex-1 sm:w-48 md:w-64 text-[var(--text)] min-w-0"
                 />
                 <button
                   onClick={() => joinRoom()}
-                  className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2"
+                  className="bg-slate-800 hover:bg-slate-700 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold transition-all flex items-center gap-2 text-sm sm:text-base shrink-0"
                 >
                   Join
-                  <ChevronRight size={20} />
+                  <ChevronRight size={18} />
                 </button>
               </div>
             </div>
@@ -216,13 +216,13 @@ export default function Home() {
 
           <div className="relative">
             <div className="absolute -inset-10 bg-emerald-500/20 blur-[100px] rounded-full opacity-30"></div>
-            <div className="relative bg-[#0b1120] border border-slate-800 rounded-[40px] p-2 shadow-2xl overflow-hidden group">
+            <div className="relative bg-[#0b1120] border border-slate-800 rounded-3xl sm:rounded-[40px] p-1.5 sm:p-2 shadow-2xl overflow-hidden group">
               <div className="h-10 bg-[#020817] flex items-center gap-1.5 px-6 border-b border-slate-800">
                 <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
                 <div className="w-3 h-3 rounded-full bg-emerald-500/50"></div>
               </div>
-              <div className="p-10 font-mono text-base space-y-6">
+              <div className="p-6 sm:p-10 font-mono text-xs sm:text-sm md:text-base space-y-4 sm:space-y-6">
                 <div className="flex gap-4">
                   <span className="text-slate-600">1</span>
                   <span className="text-emerald-400">function</span>
@@ -236,14 +236,14 @@ export default function Home() {
                   <span className="text-slate-600">3</span>
                   <span className="text-slate-300">{'}'}</span>
                 </div>
-                <div className="mt-12 pt-10 border-t border-slate-800/50 flex gap-10">
+                <div className="mt-8 sm:mt-12 pt-6 sm:pt-10 border-t border-slate-800/50 flex flex-wrap gap-4 sm:gap-10">
                   <div className="flex items-center gap-3">
-                    <Users size={20} className="text-emerald-500" />
-                    <span className="text-sm text-slate-400 font-bold uppercase tracking-widest">Active Syncing</span>
+                    <Users size={18} className="text-emerald-500" />
+                    <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest">Active Syncing</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Zap size={20} className="text-emerald-500" />
-                    <span className="text-sm text-slate-400 font-bold uppercase tracking-widest">Low Latency</span>
+                    <Zap size={18} className="text-emerald-500" />
+                    <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest">Low Latency</span>
                   </div>
                 </div>
               </div>
@@ -253,23 +253,23 @@ export default function Home() {
 
         {/* EXTENDED RECENT ROOMS SECTION */}
         {user && recentRooms.length > 3 && (
-          <div className="mt-20 md:mt-32">
-            <div className="flex items-center justify-between mb-8 md:mb-12">
-              <div className="flex items-center gap-4">
+          <div className="mt-16 sm:mt-20 md:mt-32">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 md:mb-12 gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
                 <div className="p-2 md:p-3 bg-emerald-500/10 rounded-xl text-emerald-500 shadow-inner">
-                  <Clock size={20} className="md:w-6 md:h-6" />
+                  <Clock size={18} className="w-5 h-5 md:w-6 md:h-6" />
                 </div>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tight">Recent Workspaces</h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight">Recent Workspaces</h2>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between sm:justify-start gap-4">
+                <span className="text-slate-500 text-xs sm:text-sm font-medium">Showing last {recentRooms.length} rooms</span>
                 <button 
                   onClick={clearHistory}
-                  className="px-6 py-2 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2"
+                  className="px-4 sm:px-6 py-2 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2"
                 >
-                  <XIcon size={14} />
+                  <XIcon size={12} />
                   Close All
                 </button>
-                <span className="text-slate-500 text-sm font-medium">Showing last {recentRooms.length} rooms</span>
               </div>
             </div>
             
@@ -279,11 +279,11 @@ export default function Home() {
                   <div 
                     key={room.id}
                     onClick={() => joinRoom(room.id)}
-                    className="min-w-[400px] p-10 rounded-[40px] bg-[var(--card)] border border-[var(--border)] hover:border-emerald-500/40 transition-all group cursor-pointer relative overflow-hidden snap-start hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:-translate-y-2"
+                    className="min-w-[280px] sm:min-w-[360px] md:min-w-[400px] p-6 sm:p-10 rounded-[24px] sm:rounded-[40px] bg-[var(--card)] border border-[var(--border)] hover:border-emerald-500/40 transition-all group cursor-pointer relative overflow-hidden snap-start hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:-translate-y-2"
                   >
-                    <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                      <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-black flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                        <ArrowRight size={24} />
+                    <div className="absolute top-0 right-0 p-4 sm:p-8 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                      <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-emerald-500 text-black flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                        <ArrowRight size={18} />
                       </div>
                     </div>
                     <div className="flex flex-col gap-6">
@@ -296,7 +296,7 @@ export default function Home() {
                           {room.status}
                         </div>
                       </div>
-                      <h3 className="text-3xl font-black group-hover:text-emerald-400 transition-colors truncate pr-12">{room.name}</h3>
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-black group-hover:text-emerald-400 transition-colors truncate pr-12">{room.name}</h3>
                       <div className="flex items-center gap-3 text-slate-500 text-sm mt-4">
                         <div className="w-8 h-8 rounded-full bg-slate-800/50 flex items-center justify-center">
                           <Clock size={16} />
