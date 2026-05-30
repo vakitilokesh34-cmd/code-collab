@@ -23,14 +23,34 @@ const decode = (data) => {
   return data ? Buffer.from(data, "base64").toString("utf-8") : null;
 };
 
+function prepareJavaCode(code) {
+  const trimmed = code.trim();
+  const classMatch = trimmed.match(/(?:public\s+)?class\s+(\w+)/);
+  if (classMatch) {
+    return trimmed.replace(classMatch[1], "Main");
+  }
+  if (trimmed.startsWith("//") || trimmed.startsWith("/*") || trimmed.startsWith("import") || trimmed.startsWith("package")) {
+    const firstBrace = trimmed.indexOf("{");
+    if (firstBrace === -1) {
+      return trimmed + "\npublic class Main {\n  public static void main(String[] args) {\n    // add your code here\n  }\n}";
+    }
+    return trimmed;
+  }
+  return "public class Main {\n  public static void main(String[] args) {\n" + trimmed + "\n  }\n}";
+}
+
 export const executeCode = async ({ code, language, input }) => {
   try {
     const language_id = languageMap[language] || 63;
+    let finalCode = code;
+    if (language === "java") {
+      finalCode = prepareJavaCode(code);
+    }
 
     const response = await axios.post(
       `${JUDGE0_URL}?base64_encoded=true&wait=true`,
       {
-        source_code: Buffer.from(code).toString("base64"),
+        source_code: Buffer.from(finalCode).toString("base64"),
         language_id,
         stdin: Buffer.from(input || "").toString("base64"),
       },
