@@ -3,17 +3,17 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import { connectSocket } from "../services/socket";
 import { useAuth } from "../context/AuthContext";
-import { 
-  Users, 
-  Play, 
+import {
+  Users,
+  Play,
   Share2,
-  Copy, 
-  LogOut, 
-  MessageSquare, 
-  History, 
-  ChevronRight, 
-  Activity, 
-  Shield, 
+  Copy,
+  LogOut,
+  MessageSquare,
+  History,
+  ChevronRight,
+  Activity,
+  Shield,
   Check,
   FileCode,
   Plus,
@@ -26,10 +26,12 @@ import {
   X as XIcon,
   ArrowRight,
   Clock,
-  Terminal
+  Terminal,
+  Pen
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import API from "../services/api";
+import Whiteboard from "../components/whiteboard/Whiteboard";
 
 const CURSOR_COLORS = [
   "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
@@ -412,6 +414,7 @@ export default function Room() {
         <div className="flex flex-col gap-4">
           {[
             { id: "files", icon: FileCode, label: "Files" },
+            { id: "whiteboard", icon: Pen, label: "Whiteboard" },
             { id: "users", icon: Users, label: "Online" },
             { id: "activity", icon: Activity, label: "Activity" },
             { id: "history", icon: Clock, label: "Workspaces" },
@@ -512,6 +515,30 @@ export default function Room() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {activeSidebar === "whiteboard" && (
+              <div className="p-5">
+                <div className="flex items-center justify-between mb-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                  <span>Whiteboard Tools</span>
+                </div>
+                <div className="space-y-3">
+                  <div className="p-4 rounded-2xl bg-slate-900/30 border border-slate-800/50">
+                    <h4 className="text-xs font-bold text-emerald-400 mb-1">Live Drawing</h4>
+                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                      Draw architectural diagrams, flowcharts, or explain code visually. All changes sync in real-time with collaborators.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-slate-900/30 border border-slate-800/50">
+                    <h4 className="text-xs font-bold text-emerald-400 mb-1">Shortcuts</h4>
+                    <ul className="text-[10px] text-slate-500 space-y-1">
+                      <li><span className="text-slate-400">Pen:</span> Draw freehand</li>
+                      <li><span className="text-slate-400">Eraser:</span> Remove strokes</li>
+                      <li><span className="text-slate-400">Undo:</span> Remove last stroke</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             )}
@@ -686,57 +713,63 @@ export default function Room() {
         </div>
 
         <div ref={editorContainerRef} className="flex-1 relative bg-[var(--editor-bg)] overflow-hidden">
-          <Editor
-            theme={theme === "dark" ? "vs-dark" : "light"}
-            language={language}
-            value={currentFileContent}
-            onChange={handleCodeChange}
-            onMount={(editor, monaco) => {
-              editorRef.current = editor;
-              monacoRef.current = monaco;
-              editor.onDidChangeCursorPosition(e => {
-                emitCursorMove(e.position.lineNumber, e.position.column);
-              });
-            }}
-            options={{ fontSize: 14, minimap: { enabled: false }, automaticLayout: true, padding: { top: 20 }, cursorSmoothCaretAnimation: "on" }}
-          />
-          {isResizing && (
-            <div className="absolute inset-0 z-[100] cursor-ns-resize bg-transparent" />
-          )}
-          {/* REMOTE CURSORS OVERLAY */}
-          <div className="absolute inset-0 pointer-events-none z-[9999] overflow-hidden">
-            {Object.entries(cursorPositions).map(([id, pos]) => (
-              <div
-                key={id}
-                className="absolute transition-all duration-100 ease-out"
-                style={{
-                  top: pos.top,
-                  left: pos.left,
+          {activeSidebar === "whiteboard" ? (
+            <Whiteboard socket={socket} roomId={roomId} />
+          ) : (
+            <>
+              <Editor
+                theme={theme === "dark" ? "vs-dark" : "light"}
+                language={language}
+                value={currentFileContent}
+                onChange={handleCodeChange}
+                onMount={(editor, monaco) => {
+                  editorRef.current = editor;
+                  monacoRef.current = monaco;
+                  editor.onDidChangeCursorPosition(e => {
+                    emitCursorMove(e.position.lineNumber, e.position.column);
+                  });
                 }}
-              >
-                {/* CURSOR LINE */}
-                <div 
-                  className="w-[2px] h-5 absolute top-0 left-0"
-                  style={{ 
-                    backgroundColor: pos.color, 
-                    zIndex: 10000 
-                  }}
-                />
-                {/* USER TAG */}
-                <div
-                  className="absolute bottom-full left-0 animate-in zoom-in-50 duration-200"
-                  style={{ zIndex: 10001 }}
-                >
-                  <div 
-                    className="px-2 py-[1px] rounded-t-md rounded-br-md text-[11px] font-medium whitespace-nowrap text-white shadow-sm"
-                    style={{ backgroundColor: pos.color }}
+                options={{ fontSize: 14, minimap: { enabled: false }, automaticLayout: true, padding: { top: 20 }, cursorSmoothCaretAnimation: "on" }}
+              />
+              {isResizing && (
+                <div className="absolute inset-0 z-[100] cursor-ns-resize bg-transparent" />
+              )}
+              {/* REMOTE CURSORS OVERLAY */}
+              <div className="absolute inset-0 pointer-events-none z-[9999] overflow-hidden">
+                {Object.entries(cursorPositions).map(([id, pos]) => (
+                  <div
+                    key={id}
+                    className="absolute transition-all duration-100 ease-out"
+                    style={{
+                      top: pos.top,
+                      left: pos.left,
+                    }}
                   >
-                    {pos.username}
+                    {/* CURSOR LINE */}
+                    <div 
+                      className="w-[2px] h-5 absolute top-0 left-0"
+                      style={{ 
+                        backgroundColor: pos.color, 
+                        zIndex: 10000 
+                      }}
+                    />
+                    {/* USER TAG */}
+                    <div
+                      className="absolute bottom-full left-0 animate-in zoom-in-50 duration-200"
+                      style={{ zIndex: 10001 }}
+                    >
+                      <div 
+                        className="px-2 py-[1px] rounded-t-md rounded-br-md text-[11px] font-medium whitespace-nowrap text-white shadow-sm"
+                        style={{ backgroundColor: pos.color }}
+                      >
+                        {pos.username}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
 
         {bottomPanelState !== "closed" && (

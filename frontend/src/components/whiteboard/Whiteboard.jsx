@@ -1,0 +1,233 @@
+import { useRef, useEffect, useState, useCallback } from "react";
+import { Eraser, Trash2, Pen, Minus, Plus, Undo2 } from "lucide-react";
+
+const COLORS = [
+  "#ffffff", "#ef4444", "#f97316", "#eab308", "#22c55e",
+  "#3b82f6", "#8b5cf6", "#ec4899", "#14b8a6", "#94a3b8"
+];
+
+const STROKE_WIDTHS = [2, 4, 6, 10];
+
+export default function Whiteboard({ socket, roomId }) {
+  const canvasRef = useRef(null);
+  const ctxRef = useRef(null);
+  const isDrawing = useRef(false);
+  const lastPoint = useRef(null);
+  const strokesRef = useRef([]);
+
+  const [color, setColor] = useState("#ffffff");
+  const [strokeWidth, setStrokeWidth] = useState(4);
+  const [tool, setTool] = useState("pen"); // pen | eraser
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    ctxRef.current = ctx;
+
+    const resize = () => {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      redrawAll();
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    return () => window.removeEventListener("resize", resize);
+  }, []);
+
+  const redrawAll = useCallback(() => {
+    const ctx = ctxRef.current;
+    if (!ctx) return;
+    const canvas = canvasRef.current;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const stroke of strokesRef.current) {
+      drawStroke(ctx, stroke);
+    }
+  }, []);
+
+  const drawStroke = (ctx, stroke) => {
+    if (stroke.points.length < 2) return;
+    ctx.beginPath();
+    ctx.strokeStyle = stroke.color;
+    ctx.lineWidth = stroke.width;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+    for (let i = 1; i < stroke.points.length; i++) {
+      ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+    }
+    ctx.stroke();
+  };
+
+  const getPos = (e) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    };
+  };
+
+  const startDraw = (e) => {
+    e.preventDefault();
+    isDrawing.current = true;
+    const pos = getPos(e);
+    lastPoint.current = pos;
+    const stroke = {
+      color: tool === "eraser" ? "#020817" : color,
+      width: tool === "eraser" ? strokeWidth * 3 : strokeWidth,
+      points: [pos],
+    };
+    strokesRef.current.push(stroke);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing.current) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    const stroke = strokesRef.current[strokesRef.current.length - 1];
+    stroke.points.push(pos);
+
+    const ctx = ctxRef.current;
+    ctx.beginPath();
+    ctx.strokeStyle = stroke.color;
+    ctx.lineWidth = stroke.width;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.moveTo(lastPoint.current.x, lastPoint.current.y);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    lastPoint.current = pos;
+  };
+
+  const endDraw = () => {
+    if (!isDrawing.current) return;
+    isDrawing.current = false;
+    const lastStroke = strokesRef.current[strokesRef.current.length - 1];
+    if (lastStroke) {
+      socket?.emit("whiteboard:draw", { roomId, stroke: lastStroke });
+    }
+  };
+
+  const clearCanvas = () => {
+    strokesRef.current = [];
+    const ctx = ctxRef.current;
+    if (ctx) ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    socket?.emit("whiteboard:clear", { roomId });
+  };
+
+  const undo = () => {
+    strokesRef.current.pop();
+    redrawAll();
+  };
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleDraw = (data) => {
+      strokesRef.current.push(data.stroke);
+      const ctx = ctxRef.current;
+      if (ctx) drawStroke(ctx, data.stroke);
+    };
+    const handleClear = () => {
+      strokesRef.current = [];
+      const ctx = ctxRef.current;
+      if (ctx) ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    };
+    socket.on("whiteboard:draw", handleDraw);
+    socket.on("whiteboard:clear", handleClear);
+    return () => {
+      socket.off("whiteboard:draw", handleDraw);
+      socket.off("whiteboard:clear", handleClear);
+    };
+  }, [socket]);
+
+  return (
+    <div className="flex flex-col h-full bg-[var(--editor-bg)]">
+      {/* Toolbar */}
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-[var(--border)] bg-[var(--header)] shrink-0 flex-wrap">
+        <button
+          onClick={() => setTool("pen")}
+          className={`p-1.5 rounded-md transition-all ${tool === "pen" ? "bg-emerald-500/20 text-emerald-400" : "text-slate-500 hover:text-slate-300"}`}
+          title="Pen"
+        >
+          <Pen size={16} />
+        </button>
+        <button
+          onClick={() => setTool("eraser")}
+          className={`p-1.5 rounded-md transition-all ${tool === "eraser" ? "bg-emerald-500/20 text-emerald-400" : "text-slate-500 hover:text-slate-300"}`}
+          title="Eraser"
+        >
+          <Eraser size={16} />
+        </button>
+
+        <div className="w-px h-5 bg-[var(--border)] mx-1" />
+
+        {COLORS.map((c) => (
+          <button
+            key={c}
+            onClick={() => { setColor(c); setTool("pen"); }}
+            className={`w-5 h-5 rounded-full border-2 transition-all ${color === c ? "border-emerald-400 scale-110" : "border-transparent"}`}
+            style={{ backgroundColor: c }}
+          />
+        ))}
+
+        <div className="w-px h-5 bg-[var(--border)] mx-1" />
+
+        {STROKE_WIDTHS.map((w) => (
+          <button
+            key={w}
+            onClick={() => setStrokeWidth(w)}
+            className={`p-1.5 rounded-md transition-all ${strokeWidth === w ? "bg-emerald-500/20 text-emerald-400" : "text-slate-500 hover:text-slate-300"}`}
+            title={`${w}px`}
+          >
+            <div className="rounded-full bg-current mx-auto" style={{ width: Math.min(w + 4, 14), height: Math.min(w + 4, 14) }} />
+          </button>
+        ))}
+
+        <div className="w-px h-5 bg-[var(--border)] mx-1" />
+
+        <button
+          onClick={undo}
+          className="p-1.5 rounded-md text-slate-500 hover:text-slate-300 transition-all"
+          title="Undo"
+        >
+          <Undo2 size={16} />
+        </button>
+        <button
+          onClick={clearCanvas}
+          className="p-1.5 rounded-md text-red-400 hover:text-red-300 transition-all"
+          title="Clear All"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+
+      {/* Canvas */}
+      <div className="flex-1 relative overflow-hidden">
+        <canvas
+          ref={canvasRef}
+          onMouseDown={startDraw}
+          onMouseMove={draw}
+          onMouseUp={endDraw}
+          onMouseLeave={endDraw}
+          onTouchStart={startDraw}
+          onTouchMove={draw}
+          onTouchEnd={endDraw}
+          className="absolute inset-0 cursor-crosshair touch-none"
+          style={{ background: "#020817" }}
+        />
+        {strokesRef.current.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <p className="text-slate-600 text-xs font-bold uppercase tracking-widest">
+              Draw architecture diagrams & explain code live
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

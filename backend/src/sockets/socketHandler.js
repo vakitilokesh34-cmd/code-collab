@@ -3,6 +3,7 @@ import fileSocket from "./file.socket.js";
 import codeSocket from "./code.socket.js";
 import cursorSocket from "./cursor.socket.js";
 import chatSocket from "./chat.socket.js";
+import whiteboardSocket from "./whiteboard.socket.js";
 
 // socket entry
 const socketHandler = (io) => {
@@ -31,6 +32,9 @@ const socketHandler = (io) => {
 
       // chat events
       chatSocket(io, socket);
+
+      // whiteboard events
+      whiteboardSocket(io, socket);
 
     } catch (error) {
 
