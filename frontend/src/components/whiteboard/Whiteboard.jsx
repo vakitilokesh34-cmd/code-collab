@@ -198,7 +198,7 @@ export default function Whiteboard({ socket, roomId }) {
           <button
             key={c}
             onClick={() => { setColor(c); setTool("pen"); }}
-            className={`w-5 h-5 rounded-full border-2 transition-all ${color === c ? "border-emerald-400 scale-110" : "border-transparent"}`}
+            className={`w-5 h-5 rounded-full border-2 transition-all ${color === c ? "border-emerald-400 scale-110" : "border-[var(--border)]"}`}
             style={{ backgroundColor: c }}
           />
         ))}
@@ -227,7 +227,7 @@ export default function Whiteboard({ socket, roomId }) {
         </button>
         <button
           onClick={clearCanvas}
-          className="p-1.5 rounded-md text-red-400 hover:text-red-300 transition-all"
+          className="p-1.5 rounded-md text-red-500 hover:text-red-400 transition-all"
           title="Clear All"
         >
           <Trash2 size={16} />
@@ -250,7 +250,7 @@ export default function Whiteboard({ socket, roomId }) {
         />
         {strokesRef.current.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <p className="text-[var(--text-secondary)] text-xs font-bold uppercase tracking-widest">
+            <p className="text-[var(--text)] opacity-40 text-xs font-bold uppercase tracking-widest">
               Draw architecture diagrams & explain code live
             </p>
           </div>
