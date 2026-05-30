@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { Eraser, Trash2, Pen, Minus, Plus, Undo2 } from "lucide-react";
+import { Eraser, Trash2, Pen, Undo2 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 
 const DARK_BG = "#020817";
@@ -179,14 +179,14 @@ export default function Whiteboard({ socket, roomId }) {
       <div className="flex items-center gap-2 px-3 py-2 border-b border-[var(--border)] bg-[var(--header)] shrink-0 flex-wrap">
         <button
           onClick={() => setTool("pen")}
-          className={`p-1.5 rounded-md transition-all ${tool === "pen" ? "bg-emerald-500/20 text-emerald-400" : "text-[var(--text-secondary)] hover:text-[var(--text)]"}`}
+          className={`p-1.5 rounded-md transition-all ${tool === "pen" ? "bg-emerald-500/20 text-emerald-400" : "text-[var(--text)] opacity-50 hover:opacity-100"}`}
           title="Pen"
         >
           <Pen size={16} />
         </button>
         <button
           onClick={() => setTool("eraser")}
-          className={`p-1.5 rounded-md transition-all ${tool === "eraser" ? "bg-emerald-500/20 text-emerald-400" : "text-[var(--text-secondary)] hover:text-[var(--text)]"}`}
+          className={`p-1.5 rounded-md transition-all ${tool === "eraser" ? "bg-emerald-500/20 text-emerald-400" : "text-[var(--text)] opacity-50 hover:opacity-100"}`}
           title="Eraser"
         >
           <Eraser size={16} />
@@ -209,7 +209,7 @@ export default function Whiteboard({ socket, roomId }) {
           <button
             key={w}
             onClick={() => setStrokeWidth(w)}
-            className={`p-1.5 rounded-md transition-all ${strokeWidth === w ? "bg-emerald-500/20 text-emerald-400" : "text-[var(--text-secondary)] hover:text-[var(--text)]"}`}
+            className={`p-1.5 rounded-md transition-all ${strokeWidth === w ? "bg-emerald-500/20 text-emerald-400" : "text-[var(--text)] opacity-50 hover:opacity-100"}`}
             title={`${w}px`}
           >
             <div className="rounded-full bg-current mx-auto" style={{ width: Math.min(w + 4, 14), height: Math.min(w + 4, 14) }} />
@@ -220,7 +220,7 @@ export default function Whiteboard({ socket, roomId }) {
 
         <button
           onClick={undo}
-          className="p-1.5 rounded-md text-[var(--text-secondary)] hover:text-[var(--text)] transition-all"
+          className="p-1.5 rounded-md text-[var(--text)] opacity-50 hover:opacity-100 transition-all"
           title="Undo"
         >
           <Undo2 size={16} />
