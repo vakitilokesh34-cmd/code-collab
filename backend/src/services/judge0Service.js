@@ -25,17 +25,13 @@ const decode = (data) => {
 
 function prepareJavaCode(code) {
   const trimmed = code.trim();
-  const classMatch = trimmed.match(/(?:public\s+)?class\s+(\w+)/);
-  if (classMatch) {
-    return trimmed.replace(classMatch[1], "Main");
-  }
-  if (trimmed.startsWith("//") || trimmed.startsWith("/*") || trimmed.startsWith("import") || trimmed.startsWith("package")) {
-    const firstBrace = trimmed.indexOf("{");
-    if (firstBrace === -1) {
-      return trimmed + "\npublic class Main {\n  public static void main(String[] args) {\n    // add your code here\n  }\n}";
-    }
-    return trimmed;
-  }
+  // Rename any class declaration to Main (Judge0 expects Main.java)
+  const result = trimmed.replace(/(?:public\s+)?class\s+(\w+)/, (match, name) => {
+    return match.replace(name, "Main");
+  });
+  if (result !== trimmed) return result;
+  // No class found — wrap bare code
+  if (trimmed.includes("{")) return trimmed;
   return "public class Main {\n  public static void main(String[] args) {\n" + trimmed + "\n  }\n}";
 }
 
