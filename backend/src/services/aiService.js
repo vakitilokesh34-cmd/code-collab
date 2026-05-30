@@ -82,9 +82,6 @@ export async function getAIResponse({ code, language, error, prompt }) {
     return { response };
   } catch (err) {
     console.error("AI Service Error:", err.message);
-    if (err.message?.includes("quota") || err.message?.includes("429") || err.message?.includes("RESOURCE_EXHAUSTED")) {
-      return fallbackResponse({ code, language, error, prompt });
-    }
-    return { response: `AI service error: ${err.message}` };
+    return fallbackResponse({ code, language, error, prompt });
   }
 }
