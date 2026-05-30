@@ -27,7 +27,8 @@ import {
   ArrowRight,
   Clock,
   Terminal,
-  Pen
+  Pen,
+  Zap
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import API from "../services/api";
@@ -72,6 +73,8 @@ export default function Room() {
   const [userInput, setUserInput] = useState("");
   const [bottomTab, setBottomTab] = useState("output");
   const [passwordRequired, setPasswordRequired] = useState(false);
+  const [isAiMode, setIsAiMode] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
   const [roomPassword, setRoomPassword] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [userCursorPositions, setUserCursorPositions] = useState({}); // { username: { line, column } }
@@ -296,6 +299,30 @@ export default function Room() {
     if (!text.trim() || !socket) return;
     socket.emit("chat:send", { roomId, sender: user?.username || "Guest", text });
     setText("");
+  };
+
+  const sendAiMessage = async () => {
+    if (!text.trim() || aiLoading) return;
+    const question = text;
+    setText("");
+    setAiLoading(true);
+    const userMsg = { sender: user?.username || "You", text: question, isAi: false };
+    setMessages(prev => [...prev, userMsg]);
+    const currentFile = files.find(f => f.name === activeFile);
+    try {
+      const { data } = await API.post("/ai/chat", {
+        code: currentFile?.content || "",
+        language,
+        error: output,
+        prompt: question,
+      });
+      const aiMsg = { sender: "AI", text: data.response, isAi: true };
+      setMessages(prev => [...prev, aiMsg]);
+    } catch {
+      const aiMsg = { sender: "AI", text: "AI service unavailable. Check your connection or API key.", isAi: true };
+      setMessages(prev => [...prev, aiMsg]);
+    }
+    setAiLoading(false);
   };
 
   const emitCursorMove = (line, column) => {
@@ -865,60 +892,94 @@ export default function Room() {
         <div className="fixed md:relative right-0 top-0 bottom-0 h-full z-40 w-[calc(100vw-64px)] sm:w-80 border-l border-[var(--border)] bg-[var(--sidebar)] flex flex-col shrink-0 shadow-2xl md:shadow-none animate-in slide-in-from-right duration-300">
           <div className="h-14 border-b border-[var(--border)] flex items-center justify-between px-5 shrink-0">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                <MessageSquare size={14} className="text-emerald-400" />
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${isAiMode ? "bg-purple-500/10" : "bg-emerald-500/10"}`}>
+                {isAiMode ? <Zap size={14} className="text-purple-400" /> : <MessageSquare size={14} className="text-emerald-400" />}
               </div>
-              <h2 className="text-sm font-black uppercase tracking-widest text-white">Live Chat</h2>
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <h2 className="text-sm font-black uppercase tracking-widest text-[var(--text)]">{isAiMode ? "AI Assistant" : "Live Chat"}</h2>
+              {!isAiMode && <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />}
             </div>
-            <button onClick={() => setIsChatOpen(false)} className="text-slate-500 hover:text-white transition-colors">
-              <XIcon size={16} />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => { setIsAiMode(!isAiMode); setText(""); }}
+                className={`p-1.5 rounded-md transition-all ${isAiMode ? "bg-purple-500/20 text-purple-400" : "text-[var(--text-secondary)] hover:text-[var(--text)]"}`}
+                title="AI Assistant"
+              >
+                <Zap size={15} />
+              </button>
+              <button onClick={() => setIsChatOpen(false)} className="text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
+                <XIcon size={16} />
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 p-4 space-y-3 overflow-y-auto custom-scrollbar">
-            {messages.length === 0 && (
+            {messages.length === 0 && !isAiMode && (
               <div className="flex flex-col items-center justify-center h-full gap-3 opacity-40">
-                <MessageSquare size={28} className="text-slate-600" />
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest text-center">No messages yet</p>
+                <MessageSquare size={28} className="text-[var(--text-secondary)]" />
+                <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest text-center">No messages yet</p>
+              </div>
+            )}
+            {messages.length === 0 && isAiMode && (
+              <div className="flex flex-col items-center justify-center h-full gap-3 opacity-60 px-6 text-center">
+                <Zap size={28} className="text-purple-400" />
+                <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">Ask me anything about your code</p>
+                <p className="text-[9px] text-[var(--text-secondary)] leading-relaxed">I can see your current code, language, and error output. Describe what you need help with.</p>
               </div>
             )}
             {messages.map((m, i) => (
-              <div key={i} className={`flex flex-col gap-0.5 ${m.sender === user?.username ? "items-end" : "items-start"}`}>
+              <div key={i} className={`flex flex-col gap-0.5 ${m.sender === user?.username && !m.isAi ? "items-end" : "items-start"}`}>
                 {(i === 0 || messages[i-1]?.sender !== m.sender) && (
                   <span
                     className="text-[9px] font-black uppercase tracking-widest px-1 mb-0.5"
-                    style={{ color: getUserColor(m.sender) }}
+                    style={{ color: m.isAi ? "#a78bfa" : getUserColor(m.sender) }}
                   >
-                    {m.sender === user?.username ? "You" : m.sender}
+                    {m.isAi ? "AI" : m.sender === user?.username ? "You" : m.sender}
                   </span>
                 )}
-                <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-xs leading-relaxed ${
-                  m.sender === user?.username
-                    ? "bg-emerald-500 text-black font-semibold rounded-br-sm"
-                    : "bg-slate-800/80 text-slate-100 border border-slate-700/50 rounded-bl-sm"
+                <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap ${
+                  m.isAi
+                    ? "bg-purple-500/10 text-[var(--text)] border border-purple-500/20 rounded-bl-sm"
+                    : m.sender === user?.username
+                      ? "bg-emerald-500 text-black font-semibold rounded-br-sm"
+                      : "bg-[var(--card)] text-[var(--text)] border border-[var(--border)] rounded-bl-sm"
                 }`}>
                   {m.text}
                 </div>
               </div>
             ))}
+            {aiLoading && (
+              <div className="flex items-start gap-2">
+                <div className="max-w-[85%] px-4 py-2.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 rounded-bl-sm">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="p-4 border-t border-[var(--border)] shrink-0">
-            <div className="flex items-center gap-2 bg-slate-900/60 border border-slate-800 rounded-2xl px-4 py-2.5 focus-within:border-emerald-500/50 transition-all">
+            <div className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 transition-all border ${isAiMode ? "bg-purple-500/5 border-purple-500/30 focus-within:border-purple-500/50" : "bg-[var(--card)] border-[var(--border)] focus-within:border-emerald-500/50"}`}>
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-                placeholder="Send a message..."
-                className="flex-1 bg-transparent outline-none text-xs text-white placeholder-slate-600"
+                onKeyPress={(e) => e.key === "Enter" && (isAiMode ? sendAiMessage() : sendMessage())}
+                placeholder={isAiMode ? "Ask AI to fix errors..." : "Send a message..."}
+                className="flex-1 bg-transparent outline-none text-xs text-[var(--text)] placeholder-[var(--text-secondary)]"
+                disabled={aiLoading}
               />
               <button
-                onClick={sendMessage}
-                disabled={!text.trim()}
-                className="w-7 h-7 rounded-xl bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 flex items-center justify-center text-black transition-all hover:bg-emerald-400 shrink-0"
+                onClick={isAiMode ? sendAiMessage : sendMessage}
+                disabled={!text.trim() || aiLoading}
+                className={`w-7 h-7 rounded-xl flex items-center justify-center transition-all shrink-0 ${isAiMode ? "bg-purple-500 disabled:bg-slate-700 text-white hover:bg-purple-400" : "bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-black hover:bg-emerald-400"}`}
               >
-                <ArrowRight size={13} strokeWidth={3} />
+                {aiLoading ? (
+                  <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <ArrowRight size={13} strokeWidth={3} />
+                )}
               </button>
             </div>
           </div>

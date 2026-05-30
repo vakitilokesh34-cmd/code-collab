@@ -13,6 +13,7 @@ import passport from "passport";
 import authRoutes from "./routes/authRoutes.js";
 import oauthRoutes from "./routes/oauthRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 import socketHandler from "./sockets/socketHandler.js";
 
 dotenv.config();
@@ -46,6 +47,7 @@ app.use(passport.initialize());
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", oauthRoutes);
 app.use("/api/rooms", roomRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.get("/", (req, res) => {
   res.send("CodeCollab Backend Server is running! v1.0.1 - Dynamic CORS Enabled");
