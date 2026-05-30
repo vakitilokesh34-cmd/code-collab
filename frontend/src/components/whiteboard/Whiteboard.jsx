@@ -179,14 +179,14 @@ export default function Whiteboard({ socket, roomId }) {
       <div className="flex items-center gap-2 px-3 py-2 border-b border-[var(--border)] bg-[var(--header)] shrink-0 flex-wrap">
         <button
           onClick={() => setTool("pen")}
-          className={`p-1.5 rounded-md transition-all ${tool === "pen" ? "bg-emerald-500/20 text-emerald-400" : "text-slate-500 hover:text-slate-300"}`}
+          className={`p-1.5 rounded-md transition-all ${tool === "pen" ? "bg-emerald-500/20 text-emerald-400" : "text-[var(--text-secondary)] hover:text-[var(--text)]"}`}
           title="Pen"
         >
           <Pen size={16} />
         </button>
         <button
           onClick={() => setTool("eraser")}
-          className={`p-1.5 rounded-md transition-all ${tool === "eraser" ? "bg-emerald-500/20 text-emerald-400" : "text-slate-500 hover:text-slate-300"}`}
+          className={`p-1.5 rounded-md transition-all ${tool === "eraser" ? "bg-emerald-500/20 text-emerald-400" : "text-[var(--text-secondary)] hover:text-[var(--text)]"}`}
           title="Eraser"
         >
           <Eraser size={16} />
@@ -209,7 +209,7 @@ export default function Whiteboard({ socket, roomId }) {
           <button
             key={w}
             onClick={() => setStrokeWidth(w)}
-            className={`p-1.5 rounded-md transition-all ${strokeWidth === w ? "bg-emerald-500/20 text-emerald-400" : "text-slate-500 hover:text-slate-300"}`}
+            className={`p-1.5 rounded-md transition-all ${strokeWidth === w ? "bg-emerald-500/20 text-emerald-400" : "text-[var(--text-secondary)] hover:text-[var(--text)]"}`}
             title={`${w}px`}
           >
             <div className="rounded-full bg-current mx-auto" style={{ width: Math.min(w + 4, 14), height: Math.min(w + 4, 14) }} />
@@ -220,7 +220,7 @@ export default function Whiteboard({ socket, roomId }) {
 
         <button
           onClick={undo}
-          className="p-1.5 rounded-md text-slate-500 hover:text-slate-300 transition-all"
+          className="p-1.5 rounded-md text-[var(--text-secondary)] hover:text-[var(--text)] transition-all"
           title="Undo"
         >
           <Undo2 size={16} />
@@ -250,7 +250,7 @@ export default function Whiteboard({ socket, roomId }) {
         />
         {strokesRef.current.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <p className="text-slate-600 text-xs font-bold uppercase tracking-widest">
+            <p className="text-[var(--text-secondary)] text-xs font-bold uppercase tracking-widest">
               Draw architecture diagrams & explain code live
             </p>
           </div>
