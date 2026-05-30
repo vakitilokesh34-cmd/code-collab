@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { Eraser, Trash2, Pen, Minus, Plus, Undo2 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 
@@ -27,12 +27,19 @@ export default function Whiteboard({ socket, roomId }) {
   const isDrawing = useRef(false);
   const lastPoint = useRef(null);
   const strokesRef = useRef([]);
+  const bgColorRef = useRef(bgColor);
+  bgColorRef.current = bgColor;
 
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  const colors = useMemo(() => isDark ? DARK_COLORS : LIGHT_COLORS, [isDark]);
 
   const [color, setColor] = useState(colors[0]);
   const [strokeWidth, setStrokeWidth] = useState(4);
   const [tool, setTool] = useState("pen"); // pen | eraser
+
+  useEffect(() => {
+    setColor(colors[0]);
+    redrawAll();
+  }, [isDark]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -62,10 +69,14 @@ export default function Whiteboard({ socket, roomId }) {
     }
   }, []);
 
+  const getStrokeColor = (stroke) => {
+    return stroke.eraser ? bgColorRef.current : stroke.color;
+  };
+
   const drawStroke = (ctx, stroke) => {
     if (stroke.points.length < 2) return;
     ctx.beginPath();
-    ctx.strokeStyle = stroke.color;
+    ctx.strokeStyle = getStrokeColor(stroke);
     ctx.lineWidth = stroke.width;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -92,9 +103,11 @@ export default function Whiteboard({ socket, roomId }) {
     isDrawing.current = true;
     const pos = getPos(e);
     lastPoint.current = pos;
+    const isEraser = tool === "eraser";
     const stroke = {
-      color: tool === "eraser" ? bgColor : color,
-      width: tool === "eraser" ? strokeWidth * 3 : strokeWidth,
+      color: isEraser ? bgColor : color,
+      eraser: isEraser,
+      width: isEraser ? strokeWidth * 3 : strokeWidth,
       points: [pos],
     };
     strokesRef.current.push(stroke);
@@ -109,7 +122,7 @@ export default function Whiteboard({ socket, roomId }) {
 
     const ctx = ctxRef.current;
     ctx.beginPath();
-    ctx.strokeStyle = stroke.color;
+    ctx.strokeStyle = getStrokeColor(stroke);
     ctx.lineWidth = stroke.width;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
