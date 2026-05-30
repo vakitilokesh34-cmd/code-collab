@@ -339,7 +339,7 @@ export default function Room() {
       return;
     }
 
-    setOutput("Running...");
+    setOutput(`Running ${language}...`);
     setBottomTab("output");
     setBottomPanelState("normal");
     
