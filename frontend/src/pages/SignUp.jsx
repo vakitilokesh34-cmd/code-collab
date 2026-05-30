@@ -119,6 +119,36 @@ export default function SignUp() {
             </button>
           </form>
 
+          <div className="mt-8 flex items-center gap-4">
+            <div className="flex-1 h-px bg-slate-800"></div>
+            <span className="text-xs text-slate-500 uppercase tracking-wider font-medium">or continue with</span>
+            <div className="flex-1 h-px bg-slate-800"></div>
+          </div>
+
+          <div className="mt-6 flex gap-4">
+            <a
+              href={`${import.meta.env.VITE_API_URL || ""}/api/auth/google`}
+              className="flex-1 flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-slate-700 hover:border-slate-600 rounded-2xl py-4 transition-all"
+            >
+              <svg width="20" height="20" viewBox="0 0 48 48">
+                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+                <path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+                <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
+              </svg>
+              <span className="text-sm font-medium text-slate-300">Google</span>
+            </a>
+            <a
+              href={`${import.meta.env.VITE_API_URL || ""}/api/auth/github`}
+              className="flex-1 flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-slate-700 hover:border-slate-600 rounded-2xl py-4 transition-all"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-slate-300">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+              </svg>
+              <span className="text-sm font-medium text-slate-300">GitHub</span>
+            </a>
+          </div>
+
           <p className="mt-10 text-center text-slate-400">
             Already have an account?{" "}
             <Link to="/login" state={{ from: location.state?.from }} className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">

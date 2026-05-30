@@ -9,7 +9,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 
+import passport from "passport";
 import authRoutes from "./routes/authRoutes.js";
+import oauthRoutes from "./routes/oauthRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js";
 import socketHandler from "./sockets/socketHandler.js";
 
@@ -37,8 +39,12 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// passport init
+app.use(passport.initialize());
+
 // routes
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", oauthRoutes);
 app.use("/api/rooms", roomRoutes);
 
 app.get("/", (req, res) => {

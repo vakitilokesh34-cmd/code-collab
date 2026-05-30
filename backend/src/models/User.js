@@ -20,11 +20,27 @@ const userSchema = new Schema(
       trim: true,
     },
 
-    // hashed password
+    // hashed password (optional for OAuth users)
     password: {
       type: String,
-      required: true,
       minlength: 6,
+    },
+
+    // oauth provider
+    provider: {
+      type: String,
+      enum: ["local", "google", "github"],
+      default: "local",
+    },
+
+    // oauth provider user id
+    providerId: {
+      type: String,
+    },
+
+    // avatar url from provider
+    avatar: {
+      type: String,
     },
 
     // online status

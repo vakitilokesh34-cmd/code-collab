@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Room from "./pages/Room";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import OAuthCallback from "./pages/OAuthCallback";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
       <Route path="/" element={user ? <Home /> : <Navigate to="/login" />} />
       <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/" /> : <SignUp />} />
+      <Route path="/oauth/callback" element={<OAuthCallback />} />
       <Route path="/room/:roomId" element={user ? <Room /> : <Navigate to="/login" state={{ from: location.pathname }} />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
