@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const SYSTEM_PROMPT = `You are an expert programming assistant integrated into a collaborative code editor.
 Your job is to help users understand and fix code errors.
@@ -7,45 +7,39 @@ Provide concise, actionable solutions. Include code snippets where helpful.
 Keep responses under 200 words. Be direct and friendly.`;
 
 export async function getAIResponse({ code, language, error, prompt }) {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     return {
       response:
-        "AI assistant is not configured. Set OPENAI_API_KEY in the backend environment to enable it.",
+        "AI assistant is not configured. Set GEMINI_API_KEY in the backend environment to enable it. Get a free key at https://aistudio.google.com/apikey",
     };
   }
 
   try {
-    const openai = new OpenAI({ apiKey });
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const messages = [
-      { role: "system", content: SYSTEM_PROMPT },
-      {
-        role: "user",
-        content: [
-          `Language: ${language}`,
-          error ? `Error:\n\`\`\`\n${error}\n\`\`\`` : "",
-          code ? `Code:\n\`\`\`${language}\n${code}\n\`\`\`` : "",
-          prompt,
-        ]
-          .filter(Boolean)
-          .join("\n\n"),
-      },
+    const parts = [
+      { text: SYSTEM_PROMPT },
+      { text: `Language: ${language}` },
     ];
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages,
-      max_tokens: 500,
-      temperature: 0.3,
+    if (error) parts.push({ text: `Error:\n\`\`\`\n${error}\n\`\`\`` });
+    if (code) parts.push({ text: `Code:\n\`\`\`${language}\n${code}\n\`\`\`` });
+    parts.push({ text: prompt });
+
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts }],
+      generationConfig: {
+        maxOutputTokens: 500,
+        temperature: 0.3,
+      },
     });
 
-    return {
-      response:
-        completion.choices[0]?.message?.content ||
-        "I couldn't generate a response. Please try again.",
-    };
+    const response = result.response?.text?.() || "I couldn't generate a response. Please try again.";
+
+    return { response };
   } catch (err) {
     console.error("AI Service Error:", err.message);
     return {
