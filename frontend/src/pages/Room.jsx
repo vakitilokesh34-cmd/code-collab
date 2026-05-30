@@ -678,7 +678,7 @@ export default function Room() {
                 <div 
                   key={file.name}
                   onClick={() => setActiveFile(file.name)}
-                  className={`px-2 sm:px-3 py-1 text-[10px] sm:text-xs rounded-t-lg border-x border-t border-transparent cursor-pointer flex items-center gap-1 sm:gap-2 shrink-0 transition-all ${activeFile === file.name ? "bg-slate-900 border-slate-800 text-emerald-400" : "text-slate-500 hover:text-slate-300"}`}
+                  className={`px-2 sm:px-3 py-1 text-[10px] sm:text-xs rounded-t-lg border-x border-t border-transparent cursor-pointer flex items-center gap-1 sm:gap-2 shrink-0 transition-all ${activeFile === file.name ? "bg-[var(--card)] border-[var(--border)] text-emerald-400" : "text-[var(--text-secondary)] hover:text-[var(--text)]"}`}
                 >
                   <FileText size={10} className="sm:w-3 sm:h-3" /> <span className="max-w-[60px] sm:max-w-none truncate">{file.name}</span>
                 </div>
@@ -689,7 +689,7 @@ export default function Room() {
             <select 
               value={language} 
               onChange={e => setLanguage(e.target.value)} 
-              className="bg-slate-900 border border-slate-800 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 sm:px-2 py-1 rounded-md outline-none max-w-[70px] xs:max-w-[100px] sm:max-w-none"
+              className="bg-[var(--card)] border border-[var(--border)] text-[var(--text)] text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 sm:px-2 py-1 rounded-md outline-none max-w-[70px] xs:max-w-[100px] sm:max-w-none"
             >
               {["javascript", "python", "java", "cpp", "c", "go", "rust", "ruby", "php", "typescript", "swift", "kotlin", "csharp"].map(l => <option key={l} value={l}>{l}</option>)}
             </select>
@@ -700,7 +700,7 @@ export default function Room() {
                 setIsCopying(true); 
                 setTimeout(() => setIsCopying(false), 2000)
               }} 
-              className="p-1.5 sm:p-2 bg-slate-900 border border-slate-800 rounded-md hover:bg-slate-800"
+              className="p-1.5 sm:p-2 bg-[var(--card)] border border-[var(--border)] rounded-md hover:bg-[var(--border)] text-[var(--text-secondary)]"
               title="Copy Room Link"
             >
               {isCopying ? <Check size={12} className="text-emerald-500 sm:w-3.5 sm:h-3.5" /> : <Share2 size={12} className="sm:w-3.5 sm:h-3.5" />}
