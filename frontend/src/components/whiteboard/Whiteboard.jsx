@@ -1,21 +1,36 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Eraser, Trash2, Pen, Minus, Plus, Undo2 } from "lucide-react";
+import { useTheme } from "../../context/ThemeContext";
 
-const COLORS = [
+const DARK_BG = "#020817";
+const LIGHT_BG = "#f8fafc";
+
+const DARK_COLORS = [
   "#ffffff", "#ef4444", "#f97316", "#eab308", "#22c55e",
   "#3b82f6", "#8b5cf6", "#ec4899", "#14b8a6", "#94a3b8"
+];
+
+const LIGHT_COLORS = [
+  "#0f172a", "#dc2626", "#ea580c", "#ca8a04", "#16a34a",
+  "#2563eb", "#7c3aed", "#db2777", "#0d9488", "#475569"
 ];
 
 const STROKE_WIDTHS = [2, 4, 6, 10];
 
 export default function Whiteboard({ socket, roomId }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const bgColor = isDark ? DARK_BG : LIGHT_BG;
+
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
   const isDrawing = useRef(false);
   const lastPoint = useRef(null);
   const strokesRef = useRef([]);
 
-  const [color, setColor] = useState("#ffffff");
+  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+
+  const [color, setColor] = useState(colors[0]);
   const [strokeWidth, setStrokeWidth] = useState(4);
   const [tool, setTool] = useState("pen"); // pen | eraser
 
@@ -78,7 +93,7 @@ export default function Whiteboard({ socket, roomId }) {
     const pos = getPos(e);
     lastPoint.current = pos;
     const stroke = {
-      color: tool === "eraser" ? "#020817" : color,
+      color: tool === "eraser" ? bgColor : color,
       width: tool === "eraser" ? strokeWidth * 3 : strokeWidth,
       points: [pos],
     };
@@ -166,7 +181,7 @@ export default function Whiteboard({ socket, roomId }) {
 
         <div className="w-px h-5 bg-[var(--border)] mx-1" />
 
-        {COLORS.map((c) => (
+        {colors.map((c) => (
           <button
             key={c}
             onClick={() => { setColor(c); setTool("pen"); }}
@@ -218,7 +233,7 @@ export default function Whiteboard({ socket, roomId }) {
           onTouchMove={draw}
           onTouchEnd={endDraw}
           className="absolute inset-0 cursor-crosshair touch-none"
-          style={{ background: "#020817" }}
+          style={{ background: bgColor }}
         />
         {strokesRef.current.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
