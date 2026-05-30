@@ -24,14 +24,24 @@ const decode = (data) => {
 };
 
 function prepareJavaCode(code) {
-  const trimmed = code.trim();
-  // Rename any class declaration to Main (Judge0 expects Main.java)
-  const result = trimmed.replace(/(?:public\s+)?class\s+(\w+)/, (match, name) => {
-    return match.replace(name, "Main");
-  });
-  if (result !== trimmed) return result;
-  // No class found — wrap bare code
-  if (trimmed.includes("{")) return trimmed;
+  let trimmed = code.trim();
+  // Rename the first class declaration to Main (Judge0 expects Main.java)
+  const hasClass = /(?:public\s+)?class\s+/.test(trimmed);
+  if (hasClass) {
+    trimmed = trimmed.replace(/(?:public\s+)?class\s+(\w+)/, (match, name) => {
+      return match.replace(name, "Main");
+    });
+    // Add a main method if missing
+    if (!/public\s+static\s+void\s+main\s*\(/.test(trimmed)) {
+      const mainMethod = "\n  public static void main(String[] args) {}";
+      const idx = trimmed.lastIndexOf("}");
+      if (idx !== -1) {
+        trimmed = trimmed.slice(0, idx) + mainMethod + "\n" + trimmed.slice(idx);
+      }
+    }
+    return trimmed;
+  }
+  // No class — wrap bare code in a Main class with a main method
   return "public class Main {\n  public static void main(String[] args) {\n" + trimmed + "\n  }\n}";
 }
 
